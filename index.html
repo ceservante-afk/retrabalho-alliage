@@ -4,96 +4,103 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Controle de Retrabalho – Alliage</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
-  *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:'Segoe UI',Arial,sans-serif;background:#f0f4f8;color:#1e293b;min-height:100vh}
-  /* HEADER */
-  .color-bar{display:flex;height:6px}
-  .color-bar div{flex:1}
-  .header-inner{display:flex;justify-content:space-between;align-items:center;padding:16px 24px 18px;background:#fff;box-shadow:0 2px 8px rgba(22,40,68,.08)}
-  .brand{font-size:10px;letter-spacing:4px;color:#2E5FA3;font-weight:700;margin-bottom:2px}
-  .title{font-size:17px;font-weight:700;color:#162844;letter-spacing:.5px}
-  .subtitle{font-size:11px;color:#94a3b8;margin-top:3px;text-transform:capitalize}
-  .badges{display:flex;align-items:center;background:#f8fafc;border-radius:10px;border:1px solid #e2e8f0;padding:8px 16px;gap:8px}
-  .badge-box{display:flex;flex-direction:column;align-items:center}
-  .badge-num{font-size:22px;font-weight:700;color:#2E5FA3;line-height:1}
-  .badge-num.teal{color:#1a9e8f}
-  .badge-lbl{font-size:10px;color:#94a3b8;margin-top:2px}
-  .badge-sep{width:1px;background:#e2e8f0;margin:0 4px;height:32px}
-  /* NAV */
-  nav{display:flex;background:#fff;border-bottom:1px solid #e2e8f0}
-  nav button{flex:1;padding:13px 8px;background:none;border:none;color:#94a3b8;font-size:12.5px;cursor:pointer;font-family:inherit;font-weight:500;border-bottom:3px solid transparent}
-  nav button.active{color:#2E5FA3;border-bottom:3px solid #2E5FA3;background:#eef3fb;font-weight:700}
-  /* CARD */
-  .card{margin:20px 16px;background:#fff;border-radius:10px;padding:0 20px 24px;box-shadow:0 1px 6px rgba(22,40,68,.07);border:1px solid #e2e8f0;overflow:hidden}
-  .section-bar{height:4px;background:linear-gradient(90deg,#162844,#2E5FA3,#2a85c7,#1a9e8f,#1aab78);margin:0 -20px 20px}
-  .card-title{font-size:11px;letter-spacing:2px;color:#2E5FA3;font-weight:700;margin-bottom:18px;text-transform:uppercase}
-  /* FORM */
-  .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:0}
-  .field-wrap{margin-bottom:14px}
-  label{display:block;font-size:10.5px;color:#475569;font-weight:600;letter-spacing:.5px;margin-bottom:5px}
-  .req{color:#2E5FA3}
-  input,select{width:100%;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:6px;padding:9px 12px;color:#1e293b;font-size:13px;font-family:inherit;outline:none}
-  input.err,select.err{border-color:#ef4444;background:#fff5f5}
-  .btn-row{display:flex;gap:10px;margin-top:8px;justify-content:flex-end}
-  .btn-primary{background:#2E5FA3;color:#fff;border:none;border-radius:7px;padding:10px 24px;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit}
-  .btn-primary:hover{background:#1e4a8a}
-  .btn-cancel{background:none;color:#475569;border:1.5px solid #e2e8f0;border-radius:7px;padding:10px 18px;font-size:13px;cursor:pointer;font-family:inherit}
-  /* LISTA */
-  .empty{color:#94a3b8;font-size:13px;text-align:center;padding:32px 0}
-  .item-card{display:flex;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;margin-bottom:10px;overflow:hidden}
-  .item-bar{width:4px;flex-shrink:0;background:linear-gradient(180deg,#2E5FA3,#1a9e8f)}
-  .item-body{flex:1}
-  .item-header{display:flex;align-items:center;gap:8px;padding:10px 12px 4px;flex-wrap:wrap}
-  .item-idx{font-size:10px;color:#94a3b8}
-  .item-code{font-weight:700;color:#162844;font-size:13px}
-  .item-qty{background:#fff;border:1px solid #e2e8f0;border-radius:4px;padding:2px 8px;font-size:11px;color:#475569;font-weight:600}
-  .item-meta{display:flex;gap:6px;flex-wrap:wrap;padding:0 12px 6px}
-  .chip{font-size:10.5px;padding:3px 9px;border-radius:4px;font-weight:600}
-  .chip-blue{background:#dbeafe;color:#2E5FA3}
-  .chip-teal{background:#ccfbf1;color:#0f766e}
-  .chip-gray{background:#f1f5f9;color:#475569}
-  .item-obs{font-size:11px;color:#94a3b8;padding:0 12px 6px;font-style:italic}
-  .item-actions{display:flex;gap:8px;padding:0 12px 10px}
-  .btn-sm{background:#fff;border:1px solid #e2e8f0;color:#475569;border-radius:5px;padding:4px 10px;font-size:11px;cursor:pointer;font-family:inherit}
-  .btn-sm-danger{border-color:#fecaca;color:#dc2626}
-  /* EMAIL */
-  pre{background:#f8fafc;border:1px solid #e2e8f0;border-radius:7px;padding:16px;font-size:11.5px;color:#475569;white-space:pre-wrap;margin-bottom:16px;line-height:1.8;font-family:'Courier New',monospace}
-  /* TOAST */
-  .toast{position:fixed;top:16px;right:16px;z-index:999;padding:10px 18px;border-radius:8px;font-size:12px;color:#fff;box-shadow:0 4px 12px rgba(0,0,0,.15);display:none}
-  /* LOADING */
-  .loading{text-align:center;padding:20px;color:#94a3b8;font-size:13px}
-  .tab{display:none}
-  .tab.active{display:block}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#f0f4f8;color:#1e293b;min-height:100vh}
+.color-bar{display:flex;height:6px}
+.color-bar div{flex:1}
+.header-inner{display:flex;justify-content:space-between;align-items:center;padding:16px 24px 18px;background:#fff;box-shadow:0 2px 8px rgba(22,40,68,.08)}
+.brand{font-size:10px;letter-spacing:4px;color:#2E5FA3;font-weight:700;margin-bottom:2px}
+.htitle{font-size:17px;font-weight:700;color:#162844;letter-spacing:.5px}
+.hdate{font-size:11px;color:#94a3b8;margin-top:3px;text-transform:capitalize}
+.badges{display:flex;align-items:center;background:#f8fafc;border-radius:10px;border:1px solid #e2e8f0;padding:8px 16px;gap:8px}
+.badge-box{display:flex;flex-direction:column;align-items:center}
+.badge-num{font-size:22px;font-weight:700;color:#2E5FA3;line-height:1}
+.badge-num.teal{color:#1a9e8f}
+.badge-lbl{font-size:10px;color:#94a3b8;margin-top:2px}
+.badge-sep{width:1px;background:#e2e8f0;margin:0 4px;height:32px}
+nav{display:flex;background:#fff;border-bottom:1px solid #e2e8f0}
+nav button{flex:1;padding:13px 4px;background:none;border:none;color:#94a3b8;font-size:12px;cursor:pointer;font-family:inherit;font-weight:500;border-bottom:3px solid transparent}
+nav button.active{color:#2E5FA3;border-bottom:3px solid #2E5FA3;background:#eef3fb;font-weight:700}
+.card{margin:20px 16px;background:#fff;border-radius:10px;padding:0 20px 24px;box-shadow:0 1px 6px rgba(22,40,68,.07);border:1px solid #e2e8f0;overflow:hidden}
+.section-bar{height:4px;background:linear-gradient(90deg,#162844,#2E5FA3,#2a85c7,#1a9e8f,#1aab78);margin:0 -20px 20px}
+.card-title{font-size:11px;letter-spacing:2px;color:#2E5FA3;font-weight:700;margin-bottom:18px;text-transform:uppercase}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.field-wrap{margin-bottom:14px;position:relative}
+label{display:block;font-size:10.5px;color:#475569;font-weight:600;letter-spacing:.5px;margin-bottom:5px}
+.req{color:#2E5FA3}
+input,select{width:100%;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:6px;padding:9px 12px;color:#1e293b;font-size:13px;font-family:inherit;outline:none}
+input:focus,select:focus{border-color:#2E5FA3}
+input.err,select.err{border-color:#ef4444;background:#fff5f5}
+.desc-preview{font-size:11px;color:#2E5FA3;margin-top:4px;min-height:16px;font-style:italic}
+/* Autocomplete dropdown */
+.ac-list{position:absolute;top:100%;left:0;right:0;background:#fff;border:1.5px solid #2E5FA3;border-top:none;border-radius:0 0 6px 6px;max-height:180px;overflow-y:auto;z-index:100;display:none}
+.ac-item{padding:8px 12px;font-size:12px;cursor:pointer;border-bottom:1px solid #f1f5f9}
+.ac-item:hover{background:#eef3fb}
+.ac-code{font-weight:700;color:#162844}
+.ac-name{color:#64748b;font-size:11px}
+.btn-row{display:flex;gap:10px;margin-top:8px;justify-content:flex-end}
+.btn-primary{background:#2E5FA3;color:#fff;border:none;border-radius:7px;padding:10px 24px;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit}
+.btn-primary:hover{background:#1e4a8a}
+.btn-cancel{background:none;color:#475569;border:1.5px solid #e2e8f0;border-radius:7px;padding:10px 18px;font-size:13px;cursor:pointer;font-family:inherit}
+.empty{color:#94a3b8;font-size:13px;text-align:center;padding:32px 0}
+.item-card{display:flex;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;margin-bottom:10px;overflow:hidden}
+.item-bar{width:4px;flex-shrink:0;background:linear-gradient(180deg,#2E5FA3,#1a9e8f)}
+.item-body{flex:1}
+.item-header{display:flex;align-items:center;gap:8px;padding:10px 12px 2px;flex-wrap:wrap}
+.item-idx{font-size:10px;color:#94a3b8}
+.item-code{font-weight:700;color:#162844;font-size:13px}
+.item-name{font-size:11px;color:#64748b;width:100%;padding:0 12px 4px}
+.item-qty{background:#fff;border:1px solid #e2e8f0;border-radius:4px;padding:2px 8px;font-size:11px;color:#475569;font-weight:600}
+.item-meta{display:flex;gap:6px;flex-wrap:wrap;padding:0 12px 6px}
+.chip{font-size:10.5px;padding:3px 9px;border-radius:4px;font-weight:600}
+.chip-blue{background:#dbeafe;color:#2E5FA3}
+.chip-teal{background:#ccfbf1;color:#0f766e}
+.chip-gray{background:#f1f5f9;color:#475569}
+.item-obs{font-size:11px;color:#94a3b8;padding:0 12px 6px;font-style:italic}
+.item-actions{display:flex;gap:8px;padding:0 12px 10px}
+.btn-sm{background:#fff;border:1px solid #e2e8f0;color:#475569;border-radius:5px;padding:4px 10px;font-size:11px;cursor:pointer;font-family:inherit}
+.btn-sm-danger{border-color:#fecaca;color:#dc2626}
+pre{background:#f8fafc;border:1px solid #e2e8f0;border-radius:7px;padding:16px;font-size:11.5px;color:#475569;white-space:pre-wrap;margin-bottom:16px;line-height:1.8;font-family:'Courier New',monospace}
+.toast{position:fixed;top:16px;right:16px;z-index:999;padding:10px 18px;border-radius:8px;font-size:12px;color:#fff;box-shadow:0 4px 12px rgba(0,0,0,.15);display:none}
+.tab{display:none}
+.tab.active{display:block}
+/* CHARTS */
+.charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.chart-box{background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:16px}
+.chart-title{font-size:10px;font-weight:700;color:#2E5FA3;letter-spacing:1px;text-transform:uppercase;margin-bottom:12px}
+.chart-full{grid-column:1/-1}
+.filter-row{display:flex;gap:10px;margin-bottom:16px;align-items:center;flex-wrap:wrap}
+.filter-row label{margin:0;font-size:11px}
+.filter-row select,.filter-row input{width:auto;font-size:12px;padding:6px 10px}
+@media(max-width:600px){.row2{grid-template-columns:1fr}.charts-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 
-<!-- HEADER -->
 <div class="color-bar">
-  <div style="background:#162844"></div>
-  <div style="background:#2E5FA3"></div>
-  <div style="background:#2a85c7"></div>
-  <div style="background:#1a9e8f"></div>
+  <div style="background:#162844"></div><div style="background:#2E5FA3"></div>
+  <div style="background:#2a85c7"></div><div style="background:#1a9e8f"></div>
   <div style="background:#1aab78"></div>
 </div>
 <div class="header-inner">
   <div>
     <div class="brand">ALLIAGE</div>
-    <div class="title">CONTROLE DE RETRABALHO</div>
-    <div class="subtitle" id="today-label"></div>
+    <div class="htitle">CONTROLE DE RETRABALHO</div>
+    <div class="hdate" id="today-label"></div>
   </div>
   <div class="badges">
-    <div class="badge-box"><span class="badge-num" id="badge-itens">0</span><span class="badge-lbl">itens</span></div>
+    <div class="badge-box"><span class="badge-num" id="badge-itens">0</span><span class="badge-lbl">itens hoje</span></div>
     <div class="badge-sep"></div>
-    <div class="badge-box"><span class="badge-num teal" id="badge-pcs">0</span><span class="badge-lbl">peças</span></div>
+    <div class="badge-box"><span class="badge-num teal" id="badge-pcs">0</span><span class="badge-lbl">peças hoje</span></div>
   </div>
 </div>
 
-<!-- NAV -->
 <nav>
   <button class="active" onclick="showTab('form')">➕ Registrar</button>
   <button onclick="showTab('lista')">📋 Lista (<span id="nav-count">0</span>)</button>
+  <button onclick="showTab('graficos')">📊 Gráficos</button>
   <button onclick="showTab('email')">✉️ E-mail</button>
 </nav>
 
@@ -106,7 +113,9 @@
     <div class="row2">
       <div class="field-wrap">
         <label>Código / PN <span class="req">*</span></label>
-        <input type="text" id="f-codigo" placeholder="Código / PN"/>
+        <input type="text" id="f-codigo" placeholder="Digite o código" autocomplete="off" oninput="onCodigoInput()" onblur="hideAc()"/>
+        <div class="ac-list" id="ac-list"></div>
+        <div class="desc-preview" id="desc-preview"></div>
       </div>
       <div class="field-wrap">
         <label>Quantidade (pcs) <span class="req">*</span></label>
@@ -118,34 +127,22 @@
         <label>Setor de origem <span class="req">*</span></label>
         <select id="f-setor">
           <option value="">Selecione…</option>
-          <option>Estamparia</option>
-          <option>Solda Elétrica</option>
-          <option>Galvanoplastia</option>
-          <option>Pintura</option>
-          <option>Corte a Laser</option>
-          <option>Usinagem</option>
-          <option>Micro Usinagem</option>
-          <option>Montagem</option>
-          <option>Outro</option>
+          <option>Estamparia</option><option>Solda Elétrica</option>
+          <option>Galvanoplastia</option><option>Pintura</option>
+          <option>Corte a Laser</option><option>Usinagem</option>
+          <option>Micro Usinagem</option><option>Montagem</option><option>Outro</option>
         </select>
       </div>
       <div class="field-wrap">
         <label>Tipo de defeito <span class="req">*</span></label>
         <select id="f-defeito" onchange="toggleDefeito()">
           <option value="">Selecione…</option>
-          <option>Batida / Amassado</option>
-          <option>Sujeira</option>
-          <option>Problema de matéria prima</option>
-          <option>Microagulhamento</option>
-          <option>Falha operacional</option>
-          <option>Falha de solda</option>
-          <option>Risco / Arranhão</option>
-          <option>Oxidação</option>
-          <option>Rebarbas</option>
-          <option>Dimensão fora</option>
-          <option>Furação errada</option>
-          <option>Acabamento inadequado</option>
-          <option>Outro</option>
+          <option>Batida / Amassado</option><option>Sujeira</option>
+          <option>Problema de matéria prima</option><option>Microagulhamento</option>
+          <option>Falha operacional</option><option>Falha de solda</option>
+          <option>Risco / Arranhão</option><option>Oxidação</option>
+          <option>Rebarbas</option><option>Dimensão fora</option>
+          <option>Furação errada</option><option>Acabamento inadequado</option><option>Outro</option>
         </select>
       </div>
     </div>
@@ -158,11 +155,8 @@
         <label>Resp. por avaliar retrabalho <span class="req">*</span></label>
         <select id="f-responsavel" onchange="toggleResp()">
           <option value="">Selecione…</option>
-          <option>Klever Barboza</option>
-          <option>Carlos Servante</option>
-          <option>Giuliano Pasti</option>
-          <option>Carlos (Inspetor Qualidade)</option>
-          <option>Outro</option>
+          <option>Klever Barboza</option><option>Carlos Servante</option>
+          <option>Giuliano Pasti</option><option>Carlos (Inspetor Qualidade)</option><option>Outro</option>
         </select>
       </div>
       <div></div>
@@ -187,8 +181,37 @@
   <div class="card">
     <div class="section-bar"></div>
     <div class="card-title">Registros do dia</div>
-    <div id="lista-loading" class="loading">Carregando…</div>
-    <div id="lista-container"></div>
+    <div id="lista-container"><div class="empty">Carregando…</div></div>
+  </div>
+</div>
+
+<!-- GRÁFICOS -->
+<div id="tab-graficos" class="tab">
+  <div class="card">
+    <div class="section-bar"></div>
+    <div class="card-title">Painel de análise</div>
+    <div class="filter-row">
+      <label>Período:</label>
+      <select id="graf-periodo" onchange="renderCharts()">
+        <option value="hoje">Hoje</option>
+        <option value="semana">Últimos 7 dias</option>
+        <option value="mes">Últimos 30 dias</option>
+      </select>
+    </div>
+    <div class="charts-grid">
+      <div class="chart-box">
+        <div class="chart-title">Defeitos por tipo</div>
+        <canvas id="chart-defeitos"></canvas>
+      </div>
+      <div class="chart-box">
+        <div class="chart-title">Retrabalho por setor</div>
+        <canvas id="chart-setores"></canvas>
+      </div>
+      <div class="chart-box chart-full">
+        <div class="chart-title">Evolução diária (peças)</div>
+        <canvas id="chart-evolucao"></canvas>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -203,251 +226,285 @@
   </div>
 </div>
 
-<!-- TOAST -->
 <div class="toast" id="toast"></div>
 
-<!-- FIREBASE -->
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import {
-    getFirestore, collection, addDoc, updateDoc, deleteDoc,
-    doc, onSnapshot, query, orderBy, Timestamp
-  } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+<script>
+// ── BASE DE PEÇAS ──────────────────────────────────────────
+const PECAS = {"41000002860":"CAPA FECHAMENTO AUTOCLAVE 12L BCO DB (PEÇA MENOR)","41000002861":"CAPA FECHAMENTO AUTOCLAVE 21L BCO DB (PEÇA MAIOR)","41000006699":"S/C CHASSI AUTOCLAVE 12L ACAB","41000006667":"S/C CHASSI AUTOCLAVE 21L ACAB","41000004701":"CHAPA SUPORTE ABAFADOR BV PINT","40707001579":"SUPORTE FIX COMANDO BIO VAC IV","41000007942":"CJ COLUNA IV CONS F P1 PINT (TUBO MENOR)","41000008291":"S/C BRACO HORIZONTAL EQUIPO PINT (TUBO MAIS GROSSO - BUCHA MAIS FINA)","41000006497":"S/C CHAPA ENCOSTO TORAX SOFT PINT","41000007872":"S/C COLUNA CONS S400 PINT (pezao)","41000004101":"SUPORTE II VALVULA SOLENOIDE BCO DB (COM ROSCA)","41000008512":"TUBO CAPA BRACO EQUIPO PINT","41000003382":"SUPORTE BANDEJA EQUIPO H TOP (PEÇA MAIS COMPRIDA)","41000008227":"S/C TUBO NIV SUPORTE EQ F PINT","41000008230":"CHAPA SUPORTE EQUIPO G2 F C/ NIV PINT (OBILONGO)","41000003013":"S/C HASTE DESLIZ ALAVANCA ACAB BCO DB","41000004103":"SUPORTE III VALVULA SOLENOIDE BCO DB (SEM ROSCA)","41000008253":"S/C TUBO NIV SUPORTE EQ G3 F PINT","41000008246":"CHAPA SUPORTE EQUIPO G3 F C/ NIV PINT","41000003097":"S/C ENCOSTO CABECA II CADEIRA SYNCRUS BR","41000003197":"S/C BRACO INF UNID ALC P1 BCO DB ACAB (MAIOR)","41000003126":"S/C BRACO REGULAGEM EQ P1 ACAB BCO DB","41000003171":"S/C BRACO EQUIPO SF BCO DB","41000003147":"S/C ARTICULACAO DIANT EQ FLEX BCO DB","41000002999":"S/C COMPLEMENTO ASSENTO CAD P1 BCO DB","41000003159":"S/C ARTICULACAO TRAS EQ FLEX BCO DB","41000003016":"S/C CHAPA ENC CABECA CAD BCO DB","41000008421":"S/C CHASSI II UNIDADE AGUA G2 PINT (PÉ DE PATO)","41000008237":"S/C TUBO NIV SUPORTE EQ G8 F PINT","41000008240":"S/C TUBO NIV SUPORTE EQ G8 H PINT","41000007935":"ABRACADEIRA FIXACAO BRACO EQUIPO PINT","41000003011":"S/C SUPORTE BRACO CADEIRA D700 BCO DB","41000008120":"SUP TRAVA BRACO EQUIPO PINT","41000003195":"S/C SUPORTE BRACO INF UNID SYN G4 BCO DB","41000008284":"CHASSIS UNIDADE DE AGUA G4 TRAT","41000007937":"PERFIL FIXACAO ABRACADEIRA BRACO EQ PINT","41000004048":"SUPORTE REGULADOR AR UA P1 BCO","41000003085":"S/C ESQUELETO ASSENTO CAD SYNCRUS BCO DB","41000008256":"S/C TUBO NIV SUPORTE EQ G3 H PINT","41000008261":"S/C COLUNA PEDESTAL EQ CART C/ NIV PINT","41000003234":"BASE PEDESTAL EQUIPO CART BCO DB","41000003387":"CAPA FRONTAL ASSENTO CAD P2 AC","41000008154":"CHAPA FIX TRAFO II CADEIRA P1/P2/P3 PINT","41000003381":"S/C BRACO AUXILIAR UA ALC G3 ACAB BCO DB","41000003178":"S/C CHASSI ALCANCE UA G3 NEW / G4","41000007957":"ESPACADOR COLUNA/ASSENTO CADEIRA PINT","41000003173":"S/C BRACO ALC AUX UA P1/P2 BCO DB","41000003174":"S/C BRACO ALC UA P1/P2 BCO DB","41000008144":"CJ COLUNA IV CONS SF P1 PINT (TUBO MAIOR)","41000008224":"SUPORTE FIX CAIXA EQUIPO C/NIV SF PINT","41000003015":"ARTICULACAO ENCOSTO CABECA ACAB BCO DB","41000003456":"CJ CHASSI PEDAL CHIP BLOWER P2","41000008146":"CJ COLUNA IV CONS CART P1 PINT","41000007858":"S/C ELEVACAO SUPERIOR 1/4 PINT (REFORÇADA)","41000007835":"S/C BASE 3/8 CADEIRA SYN G2 PINT","41000007848":"S/C ASSENTO REFORCADO CADEIRA S400 PINT","41000008220":"CHAPA SUPORTE EQUIPO G2 SF C/ NIV PINT (REDONDO)","41000004918":"HASTE TREND CADEIRA P2 BCO DB","41000006609":"BRACO DIREITO CADEIRA SYNCRUS PINT","41000006608":"BRACO ESQUERDO CADEIRA SYNCRUS PINT","41000007839":"ESTRUTURA BASE CAD PRESTIGE PINT","41000008250":"CHAPA SUPORTE EQUIPO G3 H C/ NIV PINT","41000004911":"S/C ELEV INFERIOR CAD P2 ACAB","41000004910":"S/C ELEV SUPERIOR P1/P2 ACAB","41000004922":"S/C CH FIX MICRO ELEV SYN ACAB","41000003079":"ARTIC ENC P/ CAPA INJ CAD SYN GL BCO DB (TATUZINHO)","41000006248":"S/C ELEV INF CAD P1 ACAB","41000003399":"CHAPA FIXACAO CAPA LATERAL CAD P2 ACAB","41000007890":"CHAPA SUPORTE COLUNA CONSULTORIO PINT","41000006361":"S/C BASE III CADEIRA P1 ACAB","41000006365":"S/C BASE III CADEIRA P1/P2 ACAB","41000002994":"S/C ASSENTO CADEIRA P1 ACAB","41000003297":"SUPORTE BANDEJA EQUIPO H G3 (PEÇA MAIS CURTA)","41000000781":"ARRUELA ARTIC SUP MONITOR BCO","41000007862":"S/C ELEVACAO INFERIOR CAD S400 PINT","41000003169":"S/C BRACO INFERIOR SUP MONITOR BCO DB","41000003843":"CHAPA APOIO MASSAGEADOR BCO DB","41000004000":"BASE PEDAL 11 TECLAS CAD SYNCRUS BCO DB","41000004001":"PESO COMPENSADOR PEDAL 13 TECLAS BCO DB","41000000724":"CHAPA ACAB CAPA SUP ASSENTO CWC ACAB","21288-346":"CHAPA ACABAMENTO ARTICULACAO CAD. CWC","20288-366":"CHAPA FIXACAO BRACO DA CAD. CWC ACAB","41000008233":"CHAPA SUPORTE EQUIPO G8 C/ NIV PINT","41000009371":"LATERAL DIREITA VERSA PINT","41000003221":"S/C BRACO ALC AUX UA P1/P2 SV BCO DB","41000006393":"S/C CHASSIS UA ALCANCE 5T PINT","41000009372":"LATERAL ESQUERDA VERSA PINT","41000004963":"S/C BRACO INF AUX UNID ALCANCE N V PINT","41000000837":"S/C CHAPA FIX MONITOR SUP MULT BCO DB","41000004966":"SUP FIX CAPA SEPARADOR DETRITOS NEW VERS","41000007777":"SUP FIX INTERRUP TECLA NEW VERSA BCO DB","41000007775":"SUP FIX TAMPA FRONT UA NEW VERSA BCO DB","41000008725":"ABRACADEIRA PARA TUBO 38MM PINT","20288-252":"ARTICULACAO ENCOSTO CWC USI","41000007774":"CHAPA ACABAMENTO PORTA FRONTAL BCO DB","41000008940":"CHAPA APOIO MASSAG ENC TORAX INJ PINT","41000007776":"CHAPA FIX COMPONENTES NEW VERSA BCO DB","41000007778":"CHAPA SUPORTE UA NEW VERSA BCO DB","41000007780":"CJ FECHAMENTO TAMPA FRONTAL","41000007772":"CJ SISTEMA ELEVACAO CAD VERSA HOF BCO DB","41000007779":"CJ TRAVA COLUNA BCO DB","41000004965":"PORTA TRASEIRA NEW VERSA","41000004962":"S/C BRACO SUP AUX UNID ALCANCE","41000007884":"S/C COLUNA FIXACAO REFLETOR VERSA PINT","41000006385":"S/C ESTR BASE CADEIRA VERSA PINT (COM TUBO)","41000006785":"HASTE DESLIZANTE ALAV VERSA HOF PINT","41000007770":"SUP FIX BRACO ARTIC CAD NEW VERSA BCO DB","41000006405":"SUP FIX TAMPA JOYSTICK BASE VERSA PINT","41000003122":"S/C BRACO HORIZONTAL EQUIPO P1 ACAB","41000004967":"SUPORTE FIX CAPA ACAB COL EQ NEW VERSA","41000008118":"SUPORTE TRAVA BRACO EQUIPO VERSA PINT","32000002102":"CHAPA GUIA CABO TELE R2 ACAB","41000004249":"CHAPA INT SUPORTE PAREDE EAGLE EDGE ACAB","41000004248":"CHAPA FIXACAO COL EAGLE EDGE ACAB","41000004244":"BRACO APOIO DE MENTO ACAB","41000004245":"CHAPA DE SUPORTE DA ESTEIRA ACAB","41000004247":"CHAPA FIXACAO CAPA COLUNA EXT ACAB","41000004256":"COMPLEMENTO PRENSA CABO DISPARADOR ACAB","41000004255":"CJ BASE DE FIXACAO DO EAGLE EDGE ACAB","41000004252":"CHAPA SUPORTE CABO LASER FRANKFURT ACAB","41000004253":"CHAPA SUPORTE SWITCH ELEVACAO ACAB","41000004254":"CHAPA TRAS FIX COLUNA EAGLE EDGE ACAB","41000004251":"CHAPA SUP DO DISPARADOR EXTERNO ACAB","41000004259":"SUPORTE DO BORNE EAGLE EDGE ACAB","41000004258":"SUPTE LASER CENT COLUNA EAGLE EDGE ACAB","41000004260":"SUPORTE FIXO DA ESTEIRA DA COLUNA ACAB","41000004261":"SUPORTE RODA LATERAL EAGLE EDGE ACAB","41000004370":"CHAPA ACIONAMENTO SENSOR OPTICO X ACAB","41000004372":"CHAPA REFORCO FIXACAO DA TELE ACAB","41000004371":"CHAPA ACIONAMENTO SENSOR OPTICO Y ACAB","41000004374":"SUPORTE DO SWITCH EAGLE EDGE ACAB","41000004375":"SUPORTE DO SENSOR OPTICO DO GIRO ACAB","41000004376":"CHAPA ESPACADORA DO SUPORTE MOTOR ACAB","41000004377":"SUPORTE MOTOR DE GIRO EAGLE EDGE ACAB","41000004380":"CJ MESA GUIA DO CABO DE GIRO ACAB","41000004378":"SUPORTE DOS CABOS EAGLE EDGE ACAB","41000004381":"GUIA DA CORREIA COM ACION SENSOR OP ACAB","41000004383":"SUPORTE DO SENSOR OPTICO X ACAB","41000004382":"CHAPA DE SUPORTE DO SENSOR OPTICO Y ACAB","41000004384":"SUPORTE DO POTENC EAGLE EDGE ACAB","41000004385":"FIM DE CURSO MEC GIRO EAGLE EDGE ACAB","41000004386":"CHAPA DE SUPORTE DA FONTE DO SWITCH ACAB","41000004388":"S/C SUPTE FIX ESTEIRA EAGLE EDGE ACAB","41000004389":"SUPTE LASER BRACO GIRO EAGLE EDGE ACAB","41000004421":"CHAPA GUIA CORREIA APOIO DE MENTO ACAB","41000004422":"CHAPA DE MOVIMENTACAO LASER CANINO ACAB","41000004424":"CHAPA FIXACAO CABO APOIO DE MENTO ACAB","41000004425":"SUPORTE MOTOR ELEV APOIO DE MENTO ACAB","41000004426":"CHAPA INF SUPTE CAPA APOIO DE MENTO ACAB","41000004427":"CHAPA ACION FIM CURSO APOIO MENTO ACAB","41000004428":"CHAPA DE FIXACAO HASTE POTENC ACAB","41000004429":"CHAPA DE SUPORTE DO LASER CANINO ACAB","41000004475":"SUPTE MOTOR HORIZONTAL COLIM PRIM ACAB","41000004476":"CHAPA ACION SENSOR OPTICO COLIMADOR ACAB","41000004477":"SUPTE SENSOR OPTICO COLIMADOR ACAB","41000004478":"CHAPA SUPTE PORCA COLIM PRIMARIO ACAB","41000004479":"CHAPA AJUSTE DO CHUMBO DA TELE ACAB","41000004480":"CHAPA AJUSTE DO CHUMBO COLIM PRIM ACAB","41000004521":"SUPORTE DO CHUMBO VERT COLIM PRIM ACAB","41000004523":"SUPTE MOTOR VERTICAL COLIM PRIM ACAB","41000004524":"CHAPA AJUSTE DO CHUMBO VERTICAL ACAB","41000004525":"SUPORTE DO COLIMADOR VERTICAL ACAB","41000004526":"CHAPA DE FIXACAO DO CHUMBO VERTICAL ACAB","41000004553":"CHAPA DE PROTECAO SENSOR SPB ACAB","41000006643":"CHAPA IV CONTRA PESO EAGLE EDGE ACAB","41000006404":"CHAPA SUPORTE I DA COLUNA EMBALAGEM ACAB","41000006096":"CHASSI COLIMADOR SEC EAGLE EDGE ACAB","41000006094":"CHAPA FIX GUIA APOIO NASAL EDGE ACAB","41000006027":"SUPTE FIXACAO DO CABECOTE EMBALAGEM ACAB","41000006063":"CONTADOR APOIO DE MENTO MOVEL EDGE ACAB","41000006064":"SUPORTE SENSOR OP ENCODER ACAB","41000006026":"CHAPA PROTECAO EMBALAGEM CABECOTE ACAB","41000004848":"CHAPA PROTECAO MESA EMB EAGLE EDGE ACAB","41000004847":"HASTE PROTECAO MESA EMB EAGLE EDGE","41000004843":"CHAPA PROT CONECTOR DISPAR EXTERNO ACAB","41000004833":"COLUNA INTERNA EAGLE EDGE ACAB (MAIS FINA)","41000004832":"COLUNA EXTERNA EAGLE EDGE ACAB (MAIS LARGA)","41000004831":"CHAPA FIX CAIXA CABECOTE EAGLE EDGE ACAB","41000004768":"CHAPA FIXACAO SENSOR 3D EAGLE EDGE ACAB","41000004767":"SUPORTE DO SENSOR 3D 15x15 EDGE ACAB","41000004766":"S/C CHAPA GUIA SUPORTE SENSOR 3D ACAB","41000004765":"CHAPA FRONTAL CONTRA PESO ACAB","41000004761":"S/C SUPORTE SENSOR 3D ACAB","41000004745":"SUPTE PAREDE FIX COLUNA EAGLE EDGE ACAB","41000004744":"SUPORTE PAREDE EAGLE EDGE ACAB","41000004732":"PERFIL ACAB LAT DIR COL EAGLE EDGE ACAB","41000004733":"PERFIL ACAB LAT ESQ COL EAGLE EDGE ACAB","41000004731":"CANTONEIRA ENCOSTO CABECOTE EMB ACAB","41000004730":"CHAPA SUPORTE DA COLUNA EMBALAGEM ACAB","41000004729":"CHAPA FIXACAO DO CABECOTE EMBALAGEM ACAB","41000004728":"SUPORTE FIXO DO CABECOTE ACAB","41000004727":"CHASSI CARRO TRANSPORTE EAGLE EDGE ACAB","41000004674":"BASE SUPORTE SENSOR TELE ACAB","41000004672":"SUPORTE TRASEIRO DO PRENSA CORREIA ACAB","41000004669":"ESPACADOR DA CREMALHEIRA TELE ACAB","41000004668":"CHAPA FIXACAO DO COLIMADOR SECUND ACAB","41000004666":"CHAPA DE AJUSTE COLIMADOR SECUND ACAB","41000004664":"CHAPA COLIMADORA SECUND EAGLE EDGE ACAB","41000004662":"CJ TUBO II SUST TELE EAGLE EDGE ACAB","41000004661":"CHAPA GUIA CABOS SNAP TELE ACAB","41000004591":"CHAPA LATERAL FIX DA BUCHA SNAP ACAB","41000004592":"CHAPA SUPERIOR DO IMA ACAB","41000004593":"CHAPA DE FECHAMENTO DO ESPELHO ACAB","41000004594":"CHAPA DE FIXACAO DO EIXO ESPELHO ACAB","41000004597":"CHAPA FIXACAO SENSOR 2D EAGLE EDGE ACAB","41000004653":"CHAPA MOVEL DE AJUSTE GIRO CRANIANO ACAB","41000004654":"CHAPA DO ESTICADOR CORREIA DA TELE ACAB","41000004655":"CHAPA ACION FIM CURSO DA TELE ACAB","41000004656":"BUCHA FIXACAO BRACO TELE ACAB","41000004657":"ESTRUTURA TELE DIGITAL EAGLE EDGE ACAB","41000004658":"GIRO CRANIANO TELE EAGLE EDGE","41000004652":"SUPORTE DE NIVELAMENTO DA TELE ACAB","41000004595":"CHAPA DE GUIA DO BOTAO ACAB","41000004659":"CJ TUBO I SUST TELE EAGLE EDGE ACAB","41000000779":"S/C ARTIC SUPTE MULTIMIDIA BCO DB","41000006367":"FILTRO COBRE TOMO 90KV EAGLE EDGE VERNIZ","41000003154":"ADAPTADOR ALGEMA S/ ROSCA BCO","41000003153":"ADAPTADOR ALGEMA C/ ROSCA BCO DB","41000009461":"SUPORTE FIXO III DO CABEÇOTE ACAB","41000006131":"PEGADOR DA HASTE DE CALIBRACAO DA TELE","41000008627":"CHAPA EXT. RESER. JATO BICARBONATO PINT.","41000008629":"CHAPA INT. RESERV. JATO BICARBONATO PINT","41000003598":"CHAPA SUP RESERV JATO BICARBONATO ACAB","42295-206":"CJ ARTICULACAO CENTRAL","41000006863":"S/C COLUNA RAIOS X SLIM PINT","41000006855":"BASE COLUNA/BRACO RX PERIAPICAL PINT","41000006858":"S/C TUBO BASE RX PERIAPICAL COLUNA PINT","41000004783":"S/C ARTIC DIANT RX PERIAP PADRON PINT","41000004780":"S/C ARTIC TRAS RX PERIAP PADRON PINT","41000004796":"S/C GARFO RAIOS X PERIAPICAL PINT","42295-202":"CJ BRACO PANTOGR/HASTE PANTOGRAFICA","20295-238":"TUBO RETO BRACO PANTOGRAFICO LONGO","41000004813":"ARTICULACAO DIANT CAB RX PANTOGR PINT","41000004811":"ARTICULACAO TRAS RX PANTOGR PINT","41000002931":"S/C BRACO RX PAREDE II BCO DB","41000004777":"S/C CHASSI CX COMANDO RAIOS X PAREDE","41000002928":"SUPORTE BRACO RX PAREDE BCO DB","41000002937":"SUPORTE II BRACO RX PANT PAREDE BCO DB","41000003806":"S/C BRACO COL REFL DUPLO BANCADA BCO DB","41000007880":"S/C BRACO HORIZONTAL REFLETOR PINT - DESTRO","41000008494":"TUBO CAPA BRACO REFLETOR PINT (COM ORELHA)","41000007888":"S/C BRACO INFERIOR EQUIPO VERSA PINT","41000000723":"CHAPA ACAB CAPA SUP ASSENTO CWC","41000007855":"S/C ESTR ASSENTO REFORCADO CAD P2 PINT"};
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyD2GnRgvIF4ueOzkDpeJJURlwHrQOLTn2c",
-    authDomain: "alliage-retrabalho.firebaseapp.com",
-    projectId: "alliage-retrabalho",
-    storageBucket: "alliage-retrabalho.firebasestorage.app",
-    messagingSenderId: "858452083224",
-    appId: "1:858452083224:web:7fc76f209abb4018a0f96d"
-  };
+// ── UTILS ─────────────────────────────────────────────────
+const todayISO = () => new Date().toISOString().slice(0,10);
+const daysAgo  = n => { const d=new Date(); d.setDate(d.getDate()-n); return d.toISOString().slice(0,10); };
 
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-  const colRef = collection(db, "retrabalho");
+document.getElementById("today-label").textContent =
+  new Date().toLocaleDateString("pt-BR",{weekday:"long",day:"2-digit",month:"2-digit",year:"numeric"});
 
-  // Data de hoje ISO
-  const todayISO = () => new Date().toISOString().slice(0, 10);
+// ── TABS ──────────────────────────────────────────────────
+window.showTab = name => {
+  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+  document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));
+  document.getElementById("tab-"+name).classList.add("active");
+  const idx = ["form","lista","graficos","email"].indexOf(name);
+  document.querySelectorAll("nav button")[idx].classList.add("active");
+  if(name==="graficos") renderCharts();
+  if(name==="email") renderEmail();
+};
 
-  // Listener em tempo real — filtra pelo dia atual
-  let items = [];
-  const q = query(colRef, orderBy("createdAt", "asc"));
+// ── AUTOCOMPLETE ──────────────────────────────────────────
+let acTimeout;
+window.onCodigoInput = () => {
+  clearTimeout(acTimeout);
+  acTimeout = setTimeout(()=>{
+    const val = document.getElementById("f-codigo").value.trim().toUpperCase();
+    const list = document.getElementById("ac-list");
+    const prev = document.getElementById("desc-preview");
+    if(!val){ list.style.display="none"; prev.textContent=""; return; }
+    // Exact match
+    if(PECAS[val]||PECAS[document.getElementById("f-codigo").value.trim()]){
+      const nome = PECAS[val]||PECAS[document.getElementById("f-codigo").value.trim()];
+      prev.textContent = nome;
+      list.style.display="none"; return;
+    }
+    prev.textContent="";
+    // Partial match
+    const matches = Object.entries(PECAS).filter(([k])=>k.toUpperCase().includes(val)).slice(0,8);
+    if(!matches.length){ list.style.display="none"; return; }
+    list.innerHTML = matches.map(([k,v])=>
+      `<div class="ac-item" onmousedown="selectAc('${k}')">
+        <div class="ac-code">${k}</div>
+        <div class="ac-name">${v.substring(0,60)}${v.length>60?"…":""}</div>
+      </div>`).join("");
+    list.style.display="block";
+  },150);
+};
+window.selectAc = code => {
+  document.getElementById("f-codigo").value = code;
+  document.getElementById("desc-preview").textContent = PECAS[code]||"";
+  document.getElementById("ac-list").style.display="none";
+};
+window.hideAc = () => setTimeout(()=>{ document.getElementById("ac-list").style.display="none"; },200);
 
-  onSnapshot(q, (snap) => {
-    items = [];
-    snap.forEach(d => {
-      const data = d.data();
-      if (data.data === todayISO()) {
-        items.push({ id: d.id, ...data });
-      }
-    });
-    renderLista();
-    renderBadges();
-    renderEmail();
-    document.getElementById("lista-loading").style.display = "none";
+window.toggleDefeito = () => {
+  document.getElementById("defeito-custom-wrap").style.display =
+    document.getElementById("f-defeito").value==="Outro"?"block":"none";
+};
+window.toggleResp = () => {
+  document.getElementById("resp-custom-wrap").style.display =
+    document.getElementById("f-responsavel").value==="Outro"?"block":"none";
+};
+
+window.showToast = (msg,type="ok") => {
+  const t=document.getElementById("toast");
+  t.textContent=msg; t.style.background=type==="warn"?"#1a9e8f":"#1aab78";
+  t.style.display="block"; setTimeout(()=>t.style.display="none",2500);
+};
+
+// ── CHARTS ────────────────────────────────────────────────
+let chartDefeitos, chartSetores, chartEvolucao;
+const PALETTE = ["#2E5FA3","#1a9e8f","#2a85c7","#1aab78","#162844","#64b5f6","#80cbc4","#a5d6a7","#90caf9","#4db6ac","#81d4fa","#b2dfdb"];
+
+window.renderCharts = () => {
+  const periodo = document.getElementById("graf-periodo").value;
+  let desde;
+  if(periodo==="hoje") desde=todayISO();
+  else if(periodo==="semana") desde=daysAgo(7);
+  else desde=daysAgo(30);
+
+  const filtered = allItems.filter(i=>i.data>=desde);
+
+  // Defeitos
+  const defMap={};
+  filtered.forEach(i=>{ defMap[i.defeitoLabel]=(defMap[i.defeitoLabel]||0)+Number(i.quantidade); });
+  const defLabels=Object.keys(defMap), defVals=Object.values(defMap);
+
+  if(chartDefeitos) chartDefeitos.destroy();
+  chartDefeitos = new Chart(document.getElementById("chart-defeitos"),{
+    type:"bar", data:{labels:defLabels,datasets:[{data:defVals,backgroundColor:PALETTE,borderRadius:5}]},
+    options:{plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{stepSize:1}}},indexAxis:"x",responsive:true}
   });
 
-  // ── Submit ────────────────────────────────────────────────
-  window.submitItem = async () => {
-    const codigo    = document.getElementById("f-codigo").value.trim();
-    const quantidade= document.getElementById("f-quantidade").value;
-    const setor     = document.getElementById("f-setor").value;
-    const defeito   = document.getElementById("f-defeito").value;
-    const defeitoCustom = document.getElementById("f-defeito-custom").value.trim();
-    const responsavel   = document.getElementById("f-responsavel").value;
-    const respCustom    = document.getElementById("f-resp-custom").value.trim();
-    const obs       = document.getElementById("f-obs").value.trim();
-    const editId    = document.getElementById("edit-id").value;
+  // Setores
+  const setMap={};
+  filtered.forEach(i=>{ setMap[i.setor]=(setMap[i.setor]||0)+Number(i.quantidade); });
+  const setLabels=Object.keys(setMap), setVals=Object.values(setMap);
 
-    // Validação
-    let ok = true;
-    ["f-codigo","f-quantidade","f-setor","f-defeito","f-responsavel"].forEach(id => {
-      const el = document.getElementById(id);
-      if (!el.value.trim()) { el.classList.add("err"); ok = false; }
-      else el.classList.remove("err");
-    });
-    if (!ok) return;
+  if(chartSetores) chartSetores.destroy();
+  chartSetores = new Chart(document.getElementById("chart-setores"),{
+    type:"bar", data:{labels:setLabels,datasets:[{data:setVals,backgroundColor:PALETTE,borderRadius:5}]},
+    options:{plugins:{legend:{display:false}},scales:{x:{beginAtZero:true,ticks:{stepSize:1}}},indexAxis:"y",responsive:true}
+  });
 
-    const defeitoLabel = defeito === "Outro" ? (defeitoCustom || "Outro") : defeito;
-    const respLabel    = responsavel === "Outro" ? (respCustom || "Outro") : responsavel;
+  // Evolução diária
+  const diasMap={};
+  filtered.forEach(i=>{ diasMap[i.data]=(diasMap[i.data]||0)+Number(i.quantidade); });
+  const diasLabels=Object.keys(diasMap).sort(), diasVals=diasLabels.map(d=>diasMap[d]);
 
-    const payload = {
-      codigo, quantidade: Number(quantidade), setor,
-      defeito, defeitoLabel, responsavel, responsavelLabel: respLabel,
-      obs, data: todayISO(), createdAt: Timestamp.now()
-    };
-
-    if (editId) {
-      await updateDoc(doc(db, "retrabalho", editId), payload);
-      showToast("Item atualizado.");
-      cancelEdit();
-    } else {
-      await addDoc(colRef, payload);
-      showToast("Item adicionado.");
-      clearForm();
-    }
-  };
-
-  window.deleteItem = async (id) => {
-    if (!confirm("Remover este item?")) return;
-    await deleteDoc(doc(db, "retrabalho", id));
-    showToast("Item removido.", "warn");
-  };
-
-  window.startEdit = (id) => {
-    const item = items.find(i => i.id === id);
-    if (!item) return;
-    document.getElementById("f-codigo").value = item.codigo;
-    document.getElementById("f-quantidade").value = item.quantidade;
-    document.getElementById("f-setor").value = item.setor;
-    document.getElementById("f-defeito").value = item.defeito;
-    document.getElementById("f-defeito-custom").value = item.defeito === "Outro" ? item.defeitoLabel : "";
-    document.getElementById("f-responsavel").value = item.responsavel;
-    document.getElementById("f-resp-custom").value = item.responsavel === "Outro" ? item.responsavelLabel : "";
-    document.getElementById("f-obs").value = item.obs || "";
-    document.getElementById("edit-id").value = id;
-    document.getElementById("form-title").textContent = "✏️ Editar item";
-    document.getElementById("btn-cancel").style.display = "inline-block";
-    document.querySelector("nav button:first-child").click();
-    window.scrollTo(0, 0);
-    toggleDefeito(); toggleResp();
-  };
-
-  window.cancelEdit = () => {
-    clearForm();
-    document.getElementById("edit-id").value = "";
-    document.getElementById("form-title").textContent = "Novo registro";
-    document.getElementById("btn-cancel").style.display = "none";
-  };
-
-  function clearForm() {
-    ["f-codigo","f-quantidade","f-obs","f-defeito-custom","f-resp-custom"].forEach(id => {
-      document.getElementById(id).value = "";
-    });
-    ["f-setor","f-defeito","f-responsavel"].forEach(id => {
-      document.getElementById(id).value = "";
-    });
-    document.getElementById("defeito-custom-wrap").style.display = "none";
-    document.getElementById("resp-custom-wrap").style.display = "none";
-  }
-
-  // ── Render lista ──────────────────────────────────────────
-  function renderLista() {
-    const c = document.getElementById("lista-container");
-    if (items.length === 0) {
-      c.innerHTML = '<div class="empty">Nenhum item registrado hoje.</div>';
-      return;
-    }
-    c.innerHTML = items.map((item, idx) => `
-      <div class="item-card">
-        <div class="item-bar"></div>
-        <div class="item-body">
-          <div class="item-header">
-            <span class="item-idx">#${idx+1}</span>
-            <span class="item-code">${item.codigo}</span>
-            <span class="item-qty">${item.quantidade} pc(s)</span>
-          </div>
-          <div class="item-meta">
-            <span class="chip chip-blue">${item.setor}</span>
-            <span class="chip chip-teal">${item.defeitoLabel}</span>
-            <span class="chip chip-gray">${item.responsavelLabel}</span>
-          </div>
-          ${item.obs ? `<div class="item-obs">Obs: ${item.obs}</div>` : ""}
-          <div class="item-actions">
-            <button class="btn-sm" onclick="startEdit('${item.id}')">✏️ Editar</button>
-            <button class="btn-sm btn-sm-danger" onclick="deleteItem('${item.id}')">🗑 Remover</button>
-          </div>
-        </div>
-      </div>
-    `).join("");
-  }
-
-  // ── Badges ────────────────────────────────────────────────
-  function renderBadges() {
-    const total = items.reduce((s, i) => s + Number(i.quantidade), 0);
-    document.getElementById("badge-itens").textContent = items.length;
-    document.getElementById("badge-pcs").textContent   = total;
-    document.getElementById("nav-count").textContent   = items.length;
-  }
-
-  // ── Email ─────────────────────────────────────────────────
-  function renderEmail() {
-    const pre   = document.getElementById("email-pre");
-    const empty = document.getElementById("email-empty");
-    const btn   = document.getElementById("btn-copy");
-    if (items.length === 0) {
-      pre.style.display="none"; btn.style.display="none";
-      empty.style.display="block"; return;
-    }
-    empty.style.display="none";
-    pre.style.display="block"; btn.style.display="inline-block";
-
-    const today = new Date().toLocaleDateString("pt-BR",{weekday:"long",day:"2-digit",month:"2-digit",year:"numeric"});
-    const total = items.reduce((s,i)=>s+Number(i.quantidade),0);
-    const rows  = items.map((i,idx)=>
-      `${idx+1}. [${i.codigo}]\n   Setor: ${i.setor} | Defeito: ${i.defeitoLabel} | Qtd: ${i.quantidade} pc(s) | Resp.: ${i.responsavelLabel}${i.obs?`\n   Obs: ${i.obs}`:""}`
-    ).join("\n\n");
-
-    pre.textContent =
-`Assunto: [RETRABALHO] Controle Diário – ${todayISO()}
-
-------------------------------------------------------
-RELATÓRIO DE RETRABALHO – ${today.toUpperCase()}
-------------------------------------------------------
-
-Total de itens registrados: ${items.length}
-Total de peças em retrabalho: ${total}
-
-DETALHAMENTO:
-
-${rows}
-
-------------------------------------------------------
-Gerado via Controle de Retrabalho – Alliage`;
-  }
-
-  window.copyEmail = () => {
-    navigator.clipboard.writeText(document.getElementById("email-pre").textContent).then(() => {
-      const btn = document.getElementById("btn-copy");
-      btn.textContent = "✅ Copiado!";
-      setTimeout(() => btn.textContent = "📋 Copiar e-mail", 2000);
-    });
-  };
+  if(chartEvolucao) chartEvolucao.destroy();
+  chartEvolucao = new Chart(document.getElementById("chart-evolucao"),{
+    type:"line",
+    data:{labels:diasLabels,datasets:[{data:diasVals,borderColor:"#2E5FA3",backgroundColor:"rgba(46,95,163,0.1)",tension:0.3,fill:true,pointBackgroundColor:"#2E5FA3",pointRadius:5}]},
+    options:{plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{stepSize:1}}},responsive:true}
+  });
+};
 </script>
 
-<script>
-  // Data no header
-  document.getElementById("today-label").textContent =
-    new Date().toLocaleDateString("pt-BR",{weekday:"long",day:"2-digit",month:"2-digit",year:"numeric"});
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query, orderBy, Timestamp }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-  // Tabs
-  window.showTab = (name) => {
-    document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
-    document.querySelectorAll("nav button").forEach(b => b.classList.remove("active"));
-    document.getElementById("tab-"+name).classList.add("active");
-    const idx = ["form","lista","email"].indexOf(name);
-    document.querySelectorAll("nav button")[idx].classList.add("active");
+const app = initializeApp({
+  apiKey:"AIzaSyD2GnRgvIF4ueOzkDpeJJURlwHrQOLTn2c",
+  authDomain:"alliage-retrabalho.firebaseapp.com",
+  projectId:"alliage-retrabalho",
+  storageBucket:"alliage-retrabalho.firebasestorage.app",
+  messagingSenderId:"858452083224",
+  appId:"1:858452083224:web:7fc76f209abb4018a0f96d"
+});
+const db = getFirestore(app);
+const colRef = collection(db,"retrabalho");
+
+window.allItems = [];
+
+onSnapshot(query(colRef,orderBy("createdAt","asc")), snap=>{
+  window.allItems=[];
+  snap.forEach(d=>window.allItems.push({id:d.id,...d.data()}));
+  const today = new Date().toISOString().slice(0,10);
+  const todayItems = window.allItems.filter(i=>i.data===today);
+  renderLista(todayItems);
+  renderBadges(todayItems);
+  renderEmail(todayItems);
+});
+
+function renderBadges(items){
+  const total=items.reduce((s,i)=>s+Number(i.quantidade),0);
+  document.getElementById("badge-itens").textContent=items.length;
+  document.getElementById("badge-pcs").textContent=total;
+  document.getElementById("nav-count").textContent=items.length;
+}
+
+function renderLista(items){
+  const c=document.getElementById("lista-container");
+  if(!items.length){ c.innerHTML='<div class="empty">Nenhum item registrado hoje.</div>'; return; }
+  c.innerHTML=items.map((item,idx)=>`
+    <div class="item-card">
+      <div class="item-bar"></div>
+      <div class="item-body">
+        <div class="item-header">
+          <span class="item-idx">#${idx+1}</span>
+          <span class="item-code">${item.codigo}</span>
+          <span class="item-qty">${item.quantidade} pc(s)</span>
+        </div>
+        ${item.nomeExibicao?`<div class="item-name">${item.nomeExibicao}</div>`:""}
+        <div class="item-meta">
+          <span class="chip chip-blue">${item.setor}</span>
+          <span class="chip chip-teal">${item.defeitoLabel}</span>
+          <span class="chip chip-gray">${item.responsavelLabel}</span>
+        </div>
+        ${item.obs?`<div class="item-obs">Obs: ${item.obs}</div>`:""}
+        <div class="item-actions">
+          <button class="btn-sm" onclick="startEdit('${item.id}')">✏️ Editar</button>
+          <button class="btn-sm btn-sm-danger" onclick="deleteItem('${item.id}')">🗑 Remover</button>
+        </div>
+      </div>
+    </div>`).join("");
+}
+
+function renderEmail(items){
+  if(!items) items=window.allItems.filter(i=>i.data===new Date().toISOString().slice(0,10));
+  const pre=document.getElementById("email-pre");
+  const empty=document.getElementById("email-empty");
+  const btn=document.getElementById("btn-copy");
+  if(!items.length){ pre.style.display="none"; btn.style.display="none"; empty.style.display="block"; return; }
+  empty.style.display="none"; pre.style.display="block"; btn.style.display="inline-block";
+  const today=new Date().toLocaleDateString("pt-BR",{weekday:"long",day:"2-digit",month:"2-digit",year:"numeric"});
+  const total=items.reduce((s,i)=>s+Number(i.quantidade),0);
+  const rows=items.map((i,idx)=>`${idx+1}. [${i.codigo}]${i.nomeExibicao?" – "+i.nomeExibicao:""}\n   Setor: ${i.setor} | Defeito: ${i.defeitoLabel} | Qtd: ${i.quantidade} pc(s) | Resp.: ${i.responsavelLabel}${i.obs?"\n   Obs: "+i.obs:""}`).join("\n\n");
+  pre.textContent=`Assunto: [RETRABALHO] Controle Diário – ${new Date().toISOString().slice(0,10)}\n\n------------------------------------------------------\nRELATÓRIO DE RETRABALHO – ${today.toUpperCase()}\n------------------------------------------------------\n\nTotal de itens: ${items.length}\nTotal de peças: ${total}\n\nDETALHAMENTO:\n\n${rows}\n\n------------------------------------------------------\nGerado via Controle de Retrabalho – Alliage`;
+}
+
+window.copyEmail=()=>{
+  navigator.clipboard.writeText(document.getElementById("email-pre").textContent).then(()=>{
+    const b=document.getElementById("btn-copy");
+    b.textContent="✅ Copiado!"; setTimeout(()=>b.textContent="📋 Copiar e-mail",2000);
+  });
+};
+
+window.submitItem = async()=>{
+  const codigo=document.getElementById("f-codigo").value.trim();
+  const quantidade=document.getElementById("f-quantidade").value;
+  const setor=document.getElementById("f-setor").value;
+  const defeito=document.getElementById("f-defeito").value;
+  const defeitoCustom=document.getElementById("f-defeito-custom").value.trim();
+  const responsavel=document.getElementById("f-responsavel").value;
+  const respCustom=document.getElementById("f-resp-custom").value.trim();
+  const obs=document.getElementById("f-obs").value.trim();
+  const editId=document.getElementById("edit-id").value;
+
+  let ok=true;
+  [["f-codigo",codigo],["f-quantidade",quantidade],["f-setor",setor],["f-defeito",defeito],["f-responsavel",responsavel]].forEach(([id,val])=>{
+    const el=document.getElementById(id);
+    if(!val){el.classList.add("err");ok=false;}else el.classList.remove("err");
+  });
+  if(!ok) return;
+
+  const nomeExibicao = PECAS[codigo] || "";
+  const payload={
+    codigo, nomeExibicao, quantidade:Number(quantidade), setor,
+    defeito, defeitoLabel:defeito==="Outro"?(defeitoCustom||"Outro"):defeito,
+    responsavel, responsavelLabel:responsavel==="Outro"?(respCustom||"Outro"):responsavel,
+    obs, data:new Date().toISOString().slice(0,10), createdAt:Timestamp.now()
   };
 
-  // Defeito / Responsável Outro
-  window.toggleDefeito = () => {
-    const v = document.getElementById("f-defeito").value;
-    document.getElementById("defeito-custom-wrap").style.display = v === "Outro" ? "block" : "none";
-  };
-  window.toggleResp = () => {
-    const v = document.getElementById("f-responsavel").value;
-    document.getElementById("resp-custom-wrap").style.display = v === "Outro" ? "block" : "none";
-  };
+  if(editId){
+    await updateDoc(doc(db,"retrabalho",editId),payload);
+    showToast("Item atualizado.");
+    cancelEdit();
+  } else {
+    await addDoc(colRef,payload);
+    showToast("Item adicionado.");
+    clearForm();
+  }
+};
 
-  // Toast
-  window.showToast = (msg, type="ok") => {
-    const t = document.getElementById("toast");
-    t.textContent = msg;
-    t.style.background = type === "warn" ? "#1a9e8f" : "#1aab78";
-    t.style.display = "block";
-    setTimeout(() => t.style.display = "none", 2500);
-  };
+window.deleteItem=async id=>{
+  if(!confirm("Remover este item?")) return;
+  await deleteDoc(doc(db,"retrabalho",id));
+  showToast("Item removido.","warn");
+};
+
+window.startEdit=id=>{
+  const item=window.allItems.find(i=>i.id===id); if(!item) return;
+  document.getElementById("f-codigo").value=item.codigo;
+  document.getElementById("desc-preview").textContent=item.nomeExibicao||"";
+  document.getElementById("f-quantidade").value=item.quantidade;
+  document.getElementById("f-setor").value=item.setor;
+  document.getElementById("f-defeito").value=item.defeito;
+  document.getElementById("f-defeito-custom").value=item.defeito==="Outro"?item.defeitoLabel:"";
+  document.getElementById("f-responsavel").value=item.responsavel;
+  document.getElementById("f-resp-custom").value=item.responsavel==="Outro"?item.responsavelLabel:"";
+  document.getElementById("f-obs").value=item.obs||"";
+  document.getElementById("edit-id").value=id;
+  document.getElementById("form-title").textContent="✏️ Editar item";
+  document.getElementById("btn-cancel").style.display="inline-block";
+  showTab("form"); window.scrollTo(0,0);
+  toggleDefeito(); toggleResp();
+};
+
+window.cancelEdit=()=>{
+  clearForm();
+  document.getElementById("edit-id").value="";
+  document.getElementById("form-title").textContent="Novo registro";
+  document.getElementById("btn-cancel").style.display="none";
+};
+
+function clearForm(){
+  ["f-codigo","f-quantidade","f-obs","f-defeito-custom","f-resp-custom"].forEach(id=>document.getElementById(id).value="");
+  ["f-setor","f-defeito","f-responsavel"].forEach(id=>document.getElementById(id).value="");
+  document.getElementById("desc-preview").textContent="";
+  document.getElementById("defeito-custom-wrap").style.display="none";
+  document.getElementById("resp-custom-wrap").style.display="none";
+}
 </script>
 </body>
 </html>
